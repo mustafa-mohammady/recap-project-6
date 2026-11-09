@@ -12,12 +12,16 @@ const artPieces: ArtPiece[] = [
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
+    year: "1889",
+    genre: "Landscape Painting",
   },
   {
     slug: "the-harvesters",
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/harvesters.jpg",
+    year: "1565",
+    genre: "Genre Painting",
   },
 ];
 
@@ -123,4 +127,27 @@ test("shows the navigation while the art pieces are loading", () => {
   expect(screen.getByText("Loading art pieces…")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Spotlight" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Gallery" })).toBeInTheDocument();
+});
+
+test("an art piece links to its details and back to the list", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces");
+  await user.click(
+    await screen.findByRole("link", { name: /The Harvesters/ })
+  );
+
+  expect(
+    screen.getByRole("heading", { name: "The Harvesters" })
+  ).toBeInTheDocument();
+  expect(screen.getByText("1565")).toBeInTheDocument();
+  expect(screen.getByText("Genre Painting")).toBeInTheDocument();
+  expect(screen.queryByRole("list")).not.toBeInTheDocument();
+
+  await user.click(
+    screen.getByRole("link", { name: "← Back to the gallery" })
+  );
+
+  expect(screen.getAllByRole("listitem")).toHaveLength(2);
 });

@@ -131,3 +131,28 @@ nav a.active {
   gap: 0.5rem;
   max-width: 24rem;
 }
+
+.art-piece a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+.details dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.details dt {
+  font-weight: bold;
+}
+
+.details dd {
+  margin: 0;
+}

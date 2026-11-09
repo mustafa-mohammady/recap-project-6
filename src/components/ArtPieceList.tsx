@@ -11,6 +11,7 @@ export default function ArtPieceList({ artPieces }: ArtPieceListProps) {
       {artPieces.map((artPiece) => (
         <li key={artPiece.slug}>
           <ArtPiecePreview
+            slug={artPiece.slug}
             image={artPiece.imageSource}
             title={artPiece.name}
             artist={artPiece.artist}
