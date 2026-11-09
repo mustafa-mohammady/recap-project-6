@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -26,7 +27,11 @@ const artPieces: ArtPiece[] = [
 test("shows every art piece as an item of the list", () => {
   render(
     <MemoryRouter>
-      <ArtPieceList artPieces={artPieces} />
+      <ArtPieceList
+        artPieces={artPieces}
+        artPiecesInfo={[]}
+        onToggleFavorite={vi.fn()}
+      />
     </MemoryRouter>
   );
 
@@ -45,9 +50,43 @@ test("shows every art piece as an item of the list", () => {
 test("shows an empty list when there are no art pieces", () => {
   render(
     <MemoryRouter>
-      <ArtPieceList artPieces={[]} />
+      <ArtPieceList
+        artPieces={[]}
+        artPiecesInfo={[]}
+        onToggleFavorite={vi.fn()}
+      />
     </MemoryRouter>
   );
 
   expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+});
+
+test("shows a favorite button for every art piece", async () => {
+  const user = userEvent.setup();
+  const handleToggleFavorite = vi.fn();
+  render(
+    <MemoryRouter>
+      <ArtPieceList
+        artPieces={artPieces}
+        artPiecesInfo={[{ slug: "the-harvesters", isFavorite: true }]}
+        onToggleFavorite={handleToggleFavorite}
+      />
+    </MemoryRouter>
+  );
+
+  const [firstItem, secondItem] = screen.getAllByRole("listitem");
+  const firstButton = within(firstItem).getByRole("button", {
+    name: "Favorite",
+  });
+  const secondButton = within(secondItem).getByRole("button", {
+    name: "Favorite",
+  });
+  expect(firstButton).toHaveAttribute("aria-pressed", "false");
+  expect(secondButton).toHaveAttribute("aria-pressed", "true");
+
+  await user.click(firstButton);
+
+  expect(handleToggleFavorite).toHaveBeenCalledWith(
+    "wheat-field-with-cypresses"
+  );
 });

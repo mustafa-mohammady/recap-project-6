@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 
-import type { ArtPiece } from "../types";
+import type { ArtPiece, ArtPieceInfo } from "../types";
 import ArtPieceDetailsPage from "./ArtPieceDetailsPage";
 
 const artPieces: ArtPiece[] = [
@@ -16,13 +17,23 @@ const artPieces: ArtPiece[] = [
 ];
 
 // the page reads the slug with useParams, so it needs the dynamic route
-function renderPage(route: string) {
+function renderPage(
+  route: string,
+  artPiecesInfo: ArtPieceInfo[] = [],
+  onToggleFavorite = vi.fn()
+) {
   render(
     <MemoryRouter initialEntries={[route]}>
       <Routes>
         <Route
           path="/art-pieces/:slug"
-          element={<ArtPieceDetailsPage artPieces={artPieces} />}
+          element={
+            <ArtPieceDetailsPage
+              artPieces={artPieces}
+              artPiecesInfo={artPiecesInfo}
+              onToggleFavorite={onToggleFavorite}
+            />
+          }
         />
       </Routes>
     </MemoryRouter>
@@ -46,4 +57,21 @@ test("shows 'Art piece not found' for an unknown slug", () => {
   expect(
     screen.getByRole("link", { name: "← Back to the gallery" })
   ).toHaveAttribute("href", "/art-pieces");
+});
+
+test("shows a favorite button that toggles the art piece", async () => {
+  const user = userEvent.setup();
+  const handleToggleFavorite = vi.fn();
+  renderPage(
+    "/art-pieces/the-harvesters",
+    [{ slug: "the-harvesters", isFavorite: true }],
+    handleToggleFavorite
+  );
+
+  const button = screen.getByRole("button", { name: "Favorite" });
+  expect(button).toHaveAttribute("aria-pressed", "true");
+
+  await user.click(button);
+
+  expect(handleToggleFavorite).toHaveBeenCalledWith("the-harvesters");
 });

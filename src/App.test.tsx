@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
@@ -150,4 +150,32 @@ test("an art piece links to its details and back to the list", async () => {
   );
 
   expect(screen.getAllByRole("listitem")).toHaveLength(2);
+});
+
+test("all pages share the favorite status of an art piece", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+  vi.spyOn(Math, "random").mockReturnValue(0.5);
+
+  // mark "The Harvesters" as a favorite in the gallery
+  renderApp("/art-pieces");
+  const items = await screen.findAllByRole("listitem");
+  await user.click(within(items[1]).getByRole("button", { name: "Favorite" }));
+  expect(
+    within(items[1]).getByRole("button", { name: "Favorite" })
+  ).toHaveAttribute("aria-pressed", "true");
+
+  // the details page shows it as a favorite, and removes it again
+  await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+  const detailsButton = screen.getByRole("button", { name: "Favorite" });
+  expect(detailsButton).toHaveAttribute("aria-pressed", "true");
+  await user.click(detailsButton);
+  expect(detailsButton).toHaveAttribute("aria-pressed", "false");
+
+  // the spotlight shows the same art piece as not a favorite anymore
+  await user.click(screen.getByRole("link", { name: "Spotlight" }));
+  expect(screen.getByRole("button", { name: "Favorite" })).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  );
 });

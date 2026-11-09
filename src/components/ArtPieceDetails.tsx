@@ -1,11 +1,15 @@
 import { Link } from "react-router";
 
+import FavoriteButton from "./FavoriteButton";
+
 type ArtPieceDetailsProps = {
   image: string;
   title: string;
   artist: string;
   year: string;
   genre: string;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 };
 
 export default function ArtPieceDetails({
@@ -14,6 +18,8 @@ export default function ArtPieceDetails({
   artist,
   year,
   genre,
+  isFavorite,
+  onToggleFavorite,
 }: ArtPieceDetailsProps) {
   return (
     <article className="details">
@@ -22,7 +28,13 @@ export default function ArtPieceDetails({
         ← Back to the gallery
       </Link>
       <img src={image} alt={`${title} by ${artist}`} />
-      <h2>{title}</h2>
+      <div className="details-header">
+        <h2>{title}</h2>
+        <FavoriteButton
+          isFavorite={isFavorite}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </div>
       <dl>
         <dt>Artist</dt>
         <dd>{artist}</dd>

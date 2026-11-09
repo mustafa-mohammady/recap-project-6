@@ -156,3 +156,16 @@ nav a.active {
 .details dd {
   margin: 0;
 }
+
+.details-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* on the details page the button sits next to the title, not on the image */
+.details .favorite-button {
+  position: static;
+  flex-shrink: 0;
+  border: 1px solid #0002;
+}

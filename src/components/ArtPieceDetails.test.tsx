@@ -12,6 +12,8 @@ function renderDetails() {
         artist="Pieter Bruegel the Elder"
         year="1565"
         genre="Genre Painting"
+        isFavorite={false}
+        onToggleFavorite={vi.fn()}
       />
     </MemoryRouter>
   );

@@ -1,10 +1,14 @@
 import { Link } from "react-router";
 
+import FavoriteButton from "./FavoriteButton";
+
 type ArtPiecePreviewProps = {
   slug: string;
   image: string;
   title: string;
   artist: string;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 };
 
 export default function ArtPiecePreview({
@@ -12,6 +16,8 @@ export default function ArtPiecePreview({
   image,
   title,
   artist,
+  isFavorite,
+  onToggleFavorite,
 }: ArtPiecePreviewProps) {
   return (
     <article className="art-piece">
@@ -21,6 +27,11 @@ export default function ArtPiecePreview({
         <h2>{title}</h2>
         <p>{artist}</p>
       </Link>
+      {/* outside the link, because a button must not be inside a link */}
+      <FavoriteButton
+        isFavorite={isFavorite}
+        onToggleFavorite={onToggleFavorite}
+      />
     </article>
   );
 }
