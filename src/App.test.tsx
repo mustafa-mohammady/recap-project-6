@@ -179,3 +179,49 @@ test("all pages share the favorite status of an art piece", async () => {
     "false"
   );
 });
+
+test("the Favorites page shows only the favorite art pieces", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  // mark "The Harvesters" as a favorite in the gallery
+  renderApp("/art-pieces");
+  const items = await screen.findAllByRole("listitem");
+  await user.click(within(items[1]).getByRole("button", { name: "Favorite" }));
+
+  await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+  const favoriteItems = screen.getAllByRole("listitem");
+  expect(favoriteItems).toHaveLength(1);
+  expect(
+    within(favoriteItems[0]).getByRole("img", {
+      name: "The Harvesters by Pieter Bruegel the Elder",
+    })
+  ).toBeInTheDocument();
+  expect(
+    within(favoriteItems[0]).getByRole("heading", { name: "The Harvesters" })
+  ).toBeInTheDocument();
+  expect(
+    within(favoriteItems[0]).getByText("Pieter Bruegel the Elder")
+  ).toBeInTheDocument();
+  expect(
+    within(favoriteItems[0]).getByRole("button", { name: "Favorite" })
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the Favorites page shows a message without favorites", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces");
+  const items = await screen.findAllByRole("listitem");
+  await user.click(within(items[0]).getByRole("button", { name: "Favorite" }));
+  await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+  await user.click(screen.getByRole("button", { name: "Favorite" }));
+
+  expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
+  expect(
+    screen.getByText("You have no favorite art pieces yet.")
+  ).toBeInTheDocument();
+});

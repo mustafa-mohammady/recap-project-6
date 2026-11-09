@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
-import { toggleFavorite } from "./artPiecesInfo";
+import { isFavorite, toggleFavorite } from "./artPiecesInfo";
 import ArtPieceDetailsPage from "./components/ArtPieceDetailsPage";
 import ArtPieceList from "./components/ArtPieceList";
 import Navigation from "./components/Navigation";
@@ -31,6 +31,10 @@ export default function App() {
   } else if (!artPieces) {
     content = <p>Loading art pieces…</p>;
   } else {
+    const favoriteArtPieces = artPieces.filter((artPiece) =>
+      isFavorite(artPiecesInfo, artPiece.slug)
+    );
+
     content = (
       <Routes>
         <Route
@@ -51,6 +55,21 @@ export default function App() {
               artPiecesInfo={artPiecesInfo}
               onToggleFavorite={handleToggleFavorite}
             />
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            // the gallery list, reused with only the favorite art pieces
+            favoriteArtPieces.length > 0 ? (
+              <ArtPieceList
+                artPieces={favoriteArtPieces}
+                artPiecesInfo={artPiecesInfo}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            ) : (
+              <p>You have no favorite art pieces yet.</p>
+            )
           }
         />
         <Route
