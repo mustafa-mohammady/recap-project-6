@@ -6,6 +6,8 @@ export type ArtPiece = {
   imageSource: string;
   year: string;
   genre: string;
+  // hex colors used in the image, for example "#37412E"
+  colors: string[];
 };
 
 export type ArtPieceComment = {

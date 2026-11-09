@@ -12,6 +12,7 @@ function renderDetails() {
         artist="Pieter Bruegel the Elder"
         year="1565"
         genre="Genre Painting"
+        colors={["#C49A4A", "#6E7A3A"]}
         isFavorite={false}
         onToggleFavorite={vi.fn()}
         comments={[
@@ -56,4 +57,12 @@ test("shows a back link to the list of art pieces", () => {
   expect(
     screen.getByRole("link", { name: "← Back to the gallery" })
   ).toHaveAttribute("href", "/art-pieces");
+});
+
+test("shows the color palette of the art piece", () => {
+  renderDetails();
+
+  const palette = screen.getByRole("region", { name: "Color palette" });
+  expect(palette).toHaveTextContent("#C49A4A");
+  expect(palette).toHaveTextContent("#6E7A3A");
 });

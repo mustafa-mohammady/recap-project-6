@@ -14,6 +14,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/wheat-field.jpg",
     year: "1889",
     genre: "Landscape Painting",
+    colors: ["#37412E", "#8D7332", "#838665", "#718F98", "#9DA59E"],
   },
   {
     slug: "the-harvesters",
@@ -22,6 +23,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/harvesters.jpg",
     year: "1565",
     genre: "Genre Painting",
+    colors: ["#C49A4A", "#6E7A3A", "#3E4A2A", "#D9C58C", "#8AA3B5"],
   },
 ];
 
@@ -143,7 +145,10 @@ test("an art piece links to its details and back to the list", async () => {
   ).toBeInTheDocument();
   expect(screen.getByText("1565")).toBeInTheDocument();
   expect(screen.getByText("Genre Painting")).toBeInTheDocument();
-  expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  // the gallery list is gone: the other art piece is not shown anymore
+  expect(
+    screen.queryByRole("heading", { name: "Wheat Field with Cypresses" })
+  ).not.toBeInTheDocument();
 
   await user.click(
     screen.getByRole("link", { name: "← Back to the gallery" })
@@ -252,4 +257,14 @@ test("a comment is shown only on its own art piece", async () => {
   expect(
     screen.queryByText("Look at the people resting")
   ).not.toBeInTheDocument();
+});
+
+test("the details page shows the color palette of the art piece", async () => {
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces/wheat-field-with-cypresses");
+
+  const palette = await screen.findByRole("region", { name: "Color palette" });
+  expect(within(palette).getAllByRole("listitem")).toHaveLength(5);
+  expect(palette).toHaveTextContent("#37412E");
 });

@@ -39,6 +39,7 @@ export default function ArtPieceDetailsPage({
       artist={artPiece.artist}
       year={artPiece.year}
       genre={artPiece.genre}
+      colors={artPiece.colors}
       isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
       onToggleFavorite={() => onToggleFavorite(artPiece.slug)}
       comments={getComments(artPiecesInfo, artPiece.slug)}

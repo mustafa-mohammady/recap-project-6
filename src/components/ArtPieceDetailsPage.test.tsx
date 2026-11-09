@@ -13,6 +13,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/harvesters.jpg",
     year: "1565",
     genre: "Genre Painting",
+    colors: ["#C49A4A", "#6E7A3A", "#3E4A2A", "#D9C58C", "#8AA3B5"],
   },
 ];
 

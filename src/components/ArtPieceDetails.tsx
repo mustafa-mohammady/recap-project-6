@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 
 import type { ArtPieceComment } from "../types";
+import ColorPalette from "./ColorPalette";
 import CommentForm from "./CommentForm";
 import Comments from "./Comments";
 import FavoriteButton from "./FavoriteButton";
@@ -11,6 +12,7 @@ type ArtPieceDetailsProps = {
   artist: string;
   year: string;
   genre: string;
+  colors: string[];
   isFavorite: boolean;
   onToggleFavorite: () => void;
   comments: ArtPieceComment[];
@@ -23,6 +25,7 @@ export default function ArtPieceDetails({
   artist,
   year,
   genre,
+  colors,
   isFavorite,
   onToggleFavorite,
   comments,
@@ -50,6 +53,7 @@ export default function ArtPieceDetails({
         <dt>Genre</dt>
         <dd>{genre}</dd>
       </dl>
+      <ColorPalette colors={colors} />
       <Comments comments={comments} />
       <CommentForm onSubmitComment={onAddComment} />
     </article>
