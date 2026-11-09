@@ -7,3 +7,9 @@ export type ArtPiece = {
   year: string;
   genre: string;
 };
+
+// our own information about an art piece, connected to it by the slug
+export type ArtPieceInfo = {
+  slug: string;
+  isFavorite: boolean;
+};

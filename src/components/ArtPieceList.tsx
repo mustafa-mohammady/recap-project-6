@@ -1,11 +1,18 @@
-import type { ArtPiece } from "../types";
+import { isFavorite } from "../artPiecesInfo";
+import type { ArtPiece, ArtPieceInfo } from "../types";
 import ArtPiecePreview from "./ArtPiecePreview";
 
 type ArtPieceListProps = {
   artPieces: ArtPiece[];
+  artPiecesInfo: ArtPieceInfo[];
+  onToggleFavorite: (slug: string) => void;
 };
 
-export default function ArtPieceList({ artPieces }: ArtPieceListProps) {
+export default function ArtPieceList({
+  artPieces,
+  artPiecesInfo,
+  onToggleFavorite,
+}: ArtPieceListProps) {
   return (
     <ul className="art-list">
       {artPieces.map((artPiece) => (
@@ -15,6 +22,8 @@ export default function ArtPieceList({ artPieces }: ArtPieceListProps) {
             image={artPiece.imageSource}
             title={artPiece.name}
             artist={artPiece.artist}
+            isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
+            onToggleFavorite={() => onToggleFavorite(artPiece.slug)}
           />
         </li>
       ))}

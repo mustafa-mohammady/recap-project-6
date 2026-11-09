@@ -1,14 +1,19 @@
 import { Link, useParams } from "react-router";
 
-import type { ArtPiece } from "../types";
+import { isFavorite } from "../artPiecesInfo";
+import type { ArtPiece, ArtPieceInfo } from "../types";
 import ArtPieceDetails from "./ArtPieceDetails";
 
 type ArtPieceDetailsPageProps = {
   artPieces: ArtPiece[];
+  artPiecesInfo: ArtPieceInfo[];
+  onToggleFavorite: (slug: string) => void;
 };
 
 export default function ArtPieceDetailsPage({
   artPieces,
+  artPiecesInfo,
+  onToggleFavorite,
 }: ArtPieceDetailsPageProps) {
   // the slug comes from the dynamic route /art-pieces/:slug
   const { slug } = useParams();
@@ -32,6 +37,8 @@ export default function ArtPieceDetailsPage({
       artist={artPiece.artist}
       year={artPiece.year}
       genre={artPiece.genre}
+      isFavorite={isFavorite(artPiecesInfo, artPiece.slug)}
+      onToggleFavorite={() => onToggleFavorite(artPiece.slug)}
     />
   );
 }

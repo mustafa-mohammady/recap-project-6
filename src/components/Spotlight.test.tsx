@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import type { ArtPiece } from "../types";
 import Spotlight from "./Spotlight";
@@ -29,7 +30,13 @@ afterEach(() => {
 test("shows the image and the artist of a random art piece", () => {
   vi.spyOn(Math, "random").mockReturnValue(0.5);
 
-  render(<Spotlight artPieces={artPieces} />);
+  render(
+    <Spotlight
+      artPieces={artPieces}
+      artPiecesInfo={[]}
+      onToggleFavorite={vi.fn()}
+    />
+  );
 
   expect(
     screen.getByRole("img", {
@@ -42,9 +49,21 @@ test("shows the image and the artist of a random art piece", () => {
 test("keeps the same art piece when it re-renders", () => {
   const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
 
-  const { rerender } = render(<Spotlight artPieces={artPieces} />);
+  const { rerender } = render(
+    <Spotlight
+      artPieces={artPieces}
+      artPiecesInfo={[]}
+      onToggleFavorite={vi.fn()}
+    />
+  );
   randomSpy.mockReturnValue(0.5);
-  rerender(<Spotlight artPieces={[...artPieces]} />);
+  rerender(
+    <Spotlight
+      artPieces={[...artPieces]}
+      artPiecesInfo={[]}
+      onToggleFavorite={vi.fn()}
+    />
+  );
 
   expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
   expect(
@@ -53,10 +72,32 @@ test("keeps the same art piece when it re-renders", () => {
 });
 
 test("shows a message when there are no art pieces", () => {
-  render(<Spotlight artPieces={[]} />);
+  render(
+    <Spotlight artPieces={[]} artPiecesInfo={[]} onToggleFavorite={vi.fn()} />
+  );
 
   expect(
     screen.getByText("There are no art pieces to show.")
   ).toBeInTheDocument();
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
+});
+
+test("shows a favorite button for the spotlight art piece", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(Math, "random").mockReturnValue(0.5);
+  const handleToggleFavorite = vi.fn();
+  render(
+    <Spotlight
+      artPieces={artPieces}
+      artPiecesInfo={[{ slug: "the-harvesters", isFavorite: true }]}
+      onToggleFavorite={handleToggleFavorite}
+    />
+  );
+
+  const button = screen.getByRole("button", { name: "Favorite" });
+  expect(button).toHaveAttribute("aria-pressed", "true");
+
+  await user.click(button);
+
+  expect(handleToggleFavorite).toHaveBeenCalledWith("the-harvesters");
 });
