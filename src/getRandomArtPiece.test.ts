@@ -7,18 +7,24 @@ const artPieces: ArtPiece[] = [
     artist: "Vincent van Gogh",
     name: "Wheat Field with Cypresses",
     imageSource: "https://example.com/wheat-field.jpg",
+    year: "1889",
+    genre: "Landscape Painting",
   },
   {
     slug: "the-harvesters",
     artist: "Pieter Bruegel the Elder",
     name: "The Harvesters",
     imageSource: "https://example.com/harvesters.jpg",
+    year: "1565",
+    genre: "Genre Painting",
   },
   {
     slug: "the-night-watch",
     artist: "Rembrandt",
     name: "The Night Watch",
     imageSource: "https://example.com/night-watch.jpg",
+    year: "1642",
+    genre: "Group Portrait",
   },
 ];
 

@@ -4,4 +4,6 @@ export type ArtPiece = {
   artist: string;
   name: string;
   imageSource: string;
+  year: string;
+  genre: string;
 };
