@@ -225,3 +225,31 @@ test("the Favorites page shows a message without favorites", async () => {
     screen.getByText("You have no favorite art pieces yet.")
   ).toBeInTheDocument();
 });
+
+test("a comment is shown only on its own art piece", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces/the-harvesters");
+  await user.type(
+    await screen.findByRole("textbox", { name: "Add a comment" }),
+    "Look at the people resting"
+  );
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  const comments = screen.getByRole("region", { name: "Comments" });
+  expect(comments).toHaveTextContent("Look at the people resting");
+  expect(within(comments).getByRole("listitem")).toContainElement(
+    comments.querySelector("time")
+  );
+
+  // another art piece has none of these comments
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  await user.click(
+    screen.getByRole("link", { name: /Wheat Field with Cypresses/ })
+  );
+  expect(screen.getByText("No comments yet.")).toBeInTheDocument();
+  expect(
+    screen.queryByText("Look at the people resting")
+  ).not.toBeInTheDocument();
+});

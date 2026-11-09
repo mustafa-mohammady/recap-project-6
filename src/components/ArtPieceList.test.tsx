@@ -68,7 +68,9 @@ test("shows a favorite button for every art piece", async () => {
     <MemoryRouter>
       <ArtPieceList
         artPieces={artPieces}
-        artPiecesInfo={[{ slug: "the-harvesters", isFavorite: true }]}
+        artPiecesInfo={[
+          { slug: "the-harvesters", isFavorite: true, comments: [] },
+        ]}
         onToggleFavorite={handleToggleFavorite}
       />
     </MemoryRouter>

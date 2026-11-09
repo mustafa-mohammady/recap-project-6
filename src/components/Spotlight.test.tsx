@@ -89,7 +89,9 @@ test("shows a favorite button for the spotlight art piece", async () => {
   render(
     <Spotlight
       artPieces={artPieces}
-      artPiecesInfo={[{ slug: "the-harvesters", isFavorite: true }]}
+      artPiecesInfo={[
+        { slug: "the-harvesters", isFavorite: true, comments: [] },
+      ]}
       onToggleFavorite={handleToggleFavorite}
     />
   );
