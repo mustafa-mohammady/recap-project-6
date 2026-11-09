@@ -72,13 +72,18 @@ test("shows an error message when the art pieces cannot be fetched", async () =>
   );
 });
 
-test("does not show the list on other routes", async () => {
+test("shows one spotlight art piece and no list on /", async () => {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+  vi.spyOn(Math, "random").mockReturnValue(0);
 
   renderApp("/");
 
   expect(
-    await screen.findByRole("heading", { name: "Art Gallery" })
+    await screen.findByRole("img", {
+      name: "Wheat Field with Cypresses by Vincent van Gogh",
+    })
   ).toBeInTheDocument();
+  expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
+  expect(screen.getAllByRole("img")).toHaveLength(1);
   expect(screen.queryByRole("list")).not.toBeInTheDocument();
 });
