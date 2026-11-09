@@ -14,5 +14,11 @@ export default defineConfig({
     setupFiles: "./src/setupTests.ts",
     // the starter has no tests yet
     passWithNoTests: true,
+    coverage: {
+      provider: "v8",
+      // lcov is the format SonarQube Cloud reads (coverage/lcov.info)
+      reporter: ["text", "lcov"],
+      include: ["src/**/*.{ts,tsx}"],
+    },
   },
 });
