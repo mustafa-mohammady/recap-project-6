@@ -32,25 +32,34 @@ export default function ArtPieceDetails({
   onAddComment,
 }: ArtPieceDetailsProps) {
   return (
-    <article className="details">
+    <article className="mx-auto max-w-2xl">
       {/* a link, because it navigates to another page */}
-      <Link to="/art-pieces" className="back-link">
+      <Link
+        to="/art-pieces"
+        className="focus-ring mb-4 inline-block rounded text-stone-700 underline-offset-4 hover:text-ink hover:underline"
+      >
         ← Back to the gallery
       </Link>
-      <img src={image} alt={`${title} by ${artist}`} />
-      <div className="details-header">
-        <h2>{title}</h2>
-        <FavoriteButton
-          isFavorite={isFavorite}
-          onToggleFavorite={onToggleFavorite}
+      <div className="relative">
+        <img
+          src={image}
+          alt={`${title} by ${artist}`}
+          className="max-h-[32rem] w-full rounded-2xl bg-stone-200 object-contain shadow-md"
         />
+        <div className="absolute top-3 right-3">
+          <FavoriteButton
+            isFavorite={isFavorite}
+            onToggleFavorite={onToggleFavorite}
+          />
+        </div>
       </div>
-      <dl>
-        <dt>Artist</dt>
+      <h2 className="mt-6 text-2xl font-bold">{title}</h2>
+      <dl className="mt-3 grid grid-cols-[max-content_1fr] gap-x-6 gap-y-1">
+        <dt className="font-semibold text-stone-500">Artist</dt>
         <dd>{artist}</dd>
-        <dt>Year</dt>
+        <dt className="font-semibold text-stone-500">Year</dt>
         <dd>{year}</dd>
-        <dt>Genre</dt>
+        <dt className="font-semibold text-stone-500">Genre</dt>
         <dd>{genre}</dd>
       </dl>
       <ColorPalette colors={colors} />

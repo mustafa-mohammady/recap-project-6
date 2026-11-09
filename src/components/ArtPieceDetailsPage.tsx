@@ -23,12 +23,15 @@ export default function ArtPieceDetailsPage({
 
   if (!artPiece) {
     return (
-      <>
-        <p>Art piece not found</p>
-        <Link to="/art-pieces" className="back-link">
+      <div className="text-center">
+        <p className="text-stone-500">Art piece not found</p>
+        <Link
+          to="/art-pieces"
+          className="focus-ring mt-4 inline-block rounded text-stone-700 underline underline-offset-4 hover:text-ink"
+        >
           ← Back to the gallery
         </Link>
-      </>
+      </div>
     );
   }
 

@@ -42,10 +42,19 @@ export default function App() {
   let content: ReactNode;
   if (error) {
     content = (
-      <p role="alert">Failed to load the art pieces. Please try again.</p>
+      <p
+        role="alert"
+        className="rounded-xl bg-red-50 p-4 text-center text-red-700"
+      >
+        Failed to load the art pieces. Please try again.
+      </p>
     );
   } else if (!artPieces) {
-    content = <p>Loading art pieces…</p>;
+    content = (
+      <p className="animate-pulse text-center text-stone-500">
+        Loading art pieces…
+      </p>
+    );
   } else {
     const favoriteArtPieces = artPieces.filter((artPiece) =>
       isFavorite(artPiecesInfo, artPiece.slug)
@@ -84,7 +93,9 @@ export default function App() {
                 onToggleFavorite={handleToggleFavorite}
               />
             ) : (
-              <p>You have no favorite art pieces yet.</p>
+              <p className="text-center text-stone-500">
+                You have no favorite art pieces yet.
+              </p>
             )
           }
         />
@@ -99,7 +110,10 @@ export default function App() {
             />
           }
         />
-        <Route path="*" element={<p>Page not found</p>} />
+        <Route
+          path="*"
+          element={<p className="text-center text-stone-500">Page not found</p>}
+        />
       </Routes>
     );
   }
@@ -107,8 +121,11 @@ export default function App() {
   // the layout and the navigation are rendered once, so every page shares them
   return (
     <>
-      <main>
-        <h1>Art Gallery</h1>
+      {/* pb-28: room at the bottom, so the fixed navigation covers nothing */}
+      <main className="mx-auto max-w-5xl px-4 pt-8 pb-28">
+        <h1 className="mb-8 text-center text-3xl font-black tracking-[0.2em] uppercase sm:text-4xl">
+          Art Gallery
+        </h1>
         {content}
       </main>
       <Navigation />

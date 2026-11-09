@@ -10,18 +10,18 @@ export default function FavoriteButton({
   return (
     <button
       type="button"
-      className="favorite-button"
       // aria-pressed tells screen readers whether the button is on,
-      // and styles.css colors the button when it is "true"
+      // and aria-pressed: colors the heart red when it is "true"
       aria-pressed={isFavorite}
       aria-label="Favorite"
       onClick={onToggleFavorite}
+      className="focus-ring grid size-11 cursor-pointer place-items-center rounded-full bg-white/90 text-stone-600 shadow-md backdrop-blur transition hover:scale-110 aria-pressed:text-rose-600 motion-reduce:transition-none motion-reduce:hover:scale-100"
     >
       {/* heart icon from lucide.dev/icons/heart, filled when favorite */}
       <svg
         aria-hidden="true"
-        width="24"
-        height="24"
+        width="22"
+        height="22"
         viewBox="0 0 24 24"
         fill={isFavorite ? "currentColor" : "none"}
         stroke="currentColor"
