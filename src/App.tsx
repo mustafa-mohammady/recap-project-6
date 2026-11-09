@@ -3,10 +3,7 @@ import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
 import { addComment, isFavorite, toggleFavorite } from "./artPiecesInfo";
-import {
-  loadArtPiecesInfo,
-  saveArtPiecesInfo,
-} from "./artPiecesInfoStorage";
+import { loadArtPiecesInfo, saveArtPiecesInfo } from "./artPiecesInfoStorage";
 import ArtPieceDetailsPage from "./components/ArtPieceDetailsPage";
 import ArtPieceList from "./components/ArtPieceList";
 import Navigation from "./components/Navigation";

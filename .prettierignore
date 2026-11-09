@@ -1,0 +1,6 @@
+# generated files (dist and coverage are already skipped through .gitignore)
+package-lock.json
+
+# course files: a change in .github/templates on main creates the issues again
+.github/templates
+.github/scripts
