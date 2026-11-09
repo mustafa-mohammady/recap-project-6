@@ -8,10 +8,7 @@
 
 /* the same visible focus outline for every link and button */
 @utility focus-ring {
-  &:focus-visible {
-    outline: 2px solid var(--color-amber-500);
-    outline-offset: 2px;
-  }
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500;
 }
 
 @layer base {
