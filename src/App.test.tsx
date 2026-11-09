@@ -28,7 +28,7 @@ const artPieces: ArtPiece[] = [
 ];
 
 function renderApp(route: string) {
-  render(
+  return render(
     // a fresh cache for every test, so the tests do not share fetched data,
     // and no retries, so a failed request does not run again after a test
     <SWRConfig
@@ -47,6 +47,8 @@ function renderApp(route: string) {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  // the app saves to the local storage, so every test starts with none
+  localStorage.clear();
 });
 
 test("shows a loading message, then all art pieces on /art-pieces", async () => {
@@ -267,4 +269,42 @@ test("the details page shows the color palette of the art piece", async () => {
   const palette = await screen.findByRole("region", { name: "Color palette" });
   expect(within(palette).getAllByRole("listitem")).toHaveLength(5);
   expect(palette).toHaveTextContent("#37412E");
+});
+
+test("favorites and comments are kept after a reload", async () => {
+  const user = userEvent.setup();
+  // a new response for every request, because a body can be read only once
+  vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
+    Response.json(artPieces)
+  );
+
+  const { unmount } = renderApp("/art-pieces/the-harvesters");
+  await user.click(await screen.findByRole("button", { name: "Favorite" }));
+  await user.type(
+    screen.getByRole("textbox", { name: "Add a comment" }),
+    "Still here after a reload"
+  );
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  // a reload: the app starts again from scratch
+  unmount();
+  renderApp("/art-pieces/the-harvesters");
+
+  expect(
+    await screen.findByRole("button", { name: "Favorite" })
+  ).toHaveAttribute("aria-pressed", "true");
+  expect(screen.getByText("Still here after a reload")).toBeInTheDocument();
+});
+
+test("the app works with broken data in the local storage", async () => {
+  localStorage.setItem("art-pieces-info", "{ not json");
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces");
+
+  const items = await screen.findAllByRole("listitem");
+  expect(items).toHaveLength(2);
+  expect(
+    within(items[0]).getByRole("button", { name: "Favorite" })
+  ).toHaveAttribute("aria-pressed", "false");
 });

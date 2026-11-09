@@ -1,8 +1,12 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
 import { addComment, isFavorite, toggleFavorite } from "./artPiecesInfo";
+import {
+  loadArtPiecesInfo,
+  saveArtPiecesInfo,
+} from "./artPiecesInfoStorage";
 import ArtPieceDetailsPage from "./components/ArtPieceDetailsPage";
 import ArtPieceList from "./components/ArtPieceList";
 import Navigation from "./components/Navigation";
@@ -16,8 +20,15 @@ export const ART_PIECES_URL = "https://example-apis.vercel.app/api/art";
 export default function App() {
   // fetched once here and passed down, so every page can use the art pieces
   const { data: artPieces, error } = useSWR(ART_PIECES_URL, fetcher);
-  // our own information (favorites and comments), shared by all pages
-  const [artPiecesInfo, setArtPiecesInfo] = useState<ArtPieceInfo[]>([]);
+  // our own information (favorites and comments), shared by all pages;
+  // the function is passed, so the local storage is read only once
+  const [artPiecesInfo, setArtPiecesInfo] =
+    useState<ArtPieceInfo[]>(loadArtPiecesInfo);
+
+  // saves the information whenever it changes, so it survives a reload
+  useEffect(() => {
+    saveArtPiecesInfo(artPiecesInfo);
+  }, [artPiecesInfo]);
 
   function handleToggleFavorite(slug: string) {
     setArtPiecesInfo((current) => toggleFavorite(current, slug));
