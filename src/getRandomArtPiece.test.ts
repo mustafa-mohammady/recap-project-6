@@ -31,18 +31,30 @@ const artPieces: ArtPiece[] = [
   },
 ];
 
+// fakes the random number, so the test knows which art piece is picked
+function mockRandomValue(value: number) {
+  return vi.spyOn(crypto, "getRandomValues").mockImplementation((array) => {
+    if (array instanceof Uint32Array) {
+      array[0] = value;
+    }
+    return array;
+  });
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
+// with 3 art pieces, the index is the remainder of the division by 3
 test.each([
-  { random: 0, expected: artPieces[0] },
-  { random: 0.5, expected: artPieces[1] },
-  { random: 0.999, expected: artPieces[2] },
+  { randomValue: 0, expected: artPieces[0] },
+  { randomValue: 4, expected: artPieces[1] },
+  { randomValue: 2, expected: artPieces[2] },
+  { randomValue: 4_294_967_295, expected: artPieces[0] },
 ])(
-  "returns the art piece for Math.random() = $random",
-  ({ random, expected }) => {
-    vi.spyOn(Math, "random").mockReturnValue(random);
+  "returns the art piece for the random value $randomValue",
+  ({ randomValue, expected }) => {
+    mockRandomValue(randomValue);
 
     expect(getRandomArtPiece(artPieces)).toBe(expected);
   }

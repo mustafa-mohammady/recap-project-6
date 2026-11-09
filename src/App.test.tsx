@@ -45,6 +45,17 @@ function renderApp(route: string) {
   );
 }
 
+// fakes the random number, so the test knows which art piece is picked:
+// with 2 art pieces, 0 picks the first and 1 picks the second
+function mockRandomValue(value: number) {
+  return vi.spyOn(crypto, "getRandomValues").mockImplementation((array) => {
+    if (array instanceof Uint32Array) {
+      array[0] = value;
+    }
+    return array;
+  });
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
   // the app saves to the local storage, so every test starts with none
@@ -83,7 +94,7 @@ test("shows an error message when the art pieces cannot be fetched", async () =>
 
 test("shows one spotlight art piece and no list on /", async () => {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
-  vi.spyOn(Math, "random").mockReturnValue(0);
+  mockRandomValue(0);
 
   renderApp("/");
 
@@ -100,7 +111,7 @@ test("shows one spotlight art piece and no list on /", async () => {
 test("the navigation links show the Gallery and the Spotlight", async () => {
   const user = userEvent.setup();
   vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
-  vi.spyOn(Math, "random").mockReturnValue(0);
+  mockRandomValue(0);
 
   renderApp("/");
   await screen.findByRole("img");
@@ -138,9 +149,7 @@ test("an art piece links to its details and back to the list", async () => {
   vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
 
   renderApp("/art-pieces");
-  await user.click(
-    await screen.findByRole("link", { name: /The Harvesters/ })
-  );
+  await user.click(await screen.findByRole("link", { name: /The Harvesters/ }));
 
   expect(
     screen.getByRole("heading", { name: "The Harvesters" })
@@ -152,9 +161,7 @@ test("an art piece links to its details and back to the list", async () => {
     screen.queryByRole("heading", { name: "Wheat Field with Cypresses" })
   ).not.toBeInTheDocument();
 
-  await user.click(
-    screen.getByRole("link", { name: "← Back to the gallery" })
-  );
+  await user.click(screen.getByRole("link", { name: "← Back to the gallery" }));
 
   expect(screen.getAllByRole("listitem")).toHaveLength(2);
 });
@@ -162,7 +169,7 @@ test("an art piece links to its details and back to the list", async () => {
 test("all pages share the favorite status of an art piece", async () => {
   const user = userEvent.setup();
   vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
-  vi.spyOn(Math, "random").mockReturnValue(0.5);
+  mockRandomValue(1);
 
   // mark "The Harvesters" as a favorite in the gallery
   renderApp("/art-pieces");

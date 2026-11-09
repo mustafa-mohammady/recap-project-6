@@ -25,9 +25,7 @@ export function loadArtPiecesInfo(): ArtPieceInfo[] {
     }
 
     const parsedValue: unknown = JSON.parse(savedValue);
-    return Array.isArray(parsedValue)
-      ? parsedValue.filter(isArtPieceInfo)
-      : [];
+    return Array.isArray(parsedValue) ? parsedValue.filter(isArtPieceInfo) : [];
   } catch {
     // invalid JSON, or the browser blocks the local storage
     return [];

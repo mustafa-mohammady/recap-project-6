@@ -25,12 +25,23 @@ const artPieces: ArtPiece[] = [
   },
 ];
 
+// fakes the random number, so the test knows which art piece is picked:
+// with 2 art pieces, 0 picks the first and 1 picks the second
+function mockRandomValue(value: number) {
+  return vi.spyOn(crypto, "getRandomValues").mockImplementation((array) => {
+    if (array instanceof Uint32Array) {
+      array[0] = value;
+    }
+    return array;
+  });
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 test("shows the image and the artist of a random art piece", () => {
-  vi.spyOn(Math, "random").mockReturnValue(0.5);
+  mockRandomValue(1);
 
   render(
     <Spotlight
@@ -49,7 +60,7 @@ test("shows the image and the artist of a random art piece", () => {
 });
 
 test("keeps the same art piece when it re-renders", () => {
-  const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
+  mockRandomValue(0);
 
   const { rerender } = render(
     <Spotlight
@@ -58,7 +69,7 @@ test("keeps the same art piece when it re-renders", () => {
       onToggleFavorite={vi.fn()}
     />
   );
-  randomSpy.mockReturnValue(0.5);
+  mockRandomValue(1);
   rerender(
     <Spotlight
       artPieces={[...artPieces]}
@@ -86,7 +97,7 @@ test("shows a message when there are no art pieces", () => {
 
 test("shows a favorite button for the spotlight art piece", async () => {
   const user = userEvent.setup();
-  vi.spyOn(Math, "random").mockReturnValue(0.5);
+  mockRandomValue(1);
   const handleToggleFavorite = vi.fn();
   render(
     <Spotlight

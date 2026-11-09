@@ -9,9 +9,7 @@ const artPiecesInfo: ArtPieceInfo[] = [
   {
     slug: "the-harvesters",
     isFavorite: true,
-    comments: [
-      { text: "Wonderful colors", date: "2026-11-09T10:00:00.000Z" },
-    ],
+    comments: [{ text: "Wonderful colors", date: "2026-11-09T10:00:00.000Z" }],
   },
 ];
 

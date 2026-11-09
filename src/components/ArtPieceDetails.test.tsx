@@ -27,9 +27,9 @@ function renderDetails() {
 test("shows the comments section and the comment form", () => {
   renderDetails();
 
-  expect(
-    screen.getByRole("region", { name: "Comments" })
-  ).toHaveTextContent("Wonderful colors");
+  expect(screen.getByRole("region", { name: "Comments" })).toHaveTextContent(
+    "Wonderful colors"
+  );
   expect(
     screen.getByRole("textbox", { name: "Add a comment" })
   ).toBeInTheDocument();

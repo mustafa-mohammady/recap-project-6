@@ -25,7 +25,9 @@ export default function Comments({ comments }: CommentsProps) {
               key={`${comment.date}-${comment.text}`}
               className="rounded-xl bg-white p-4 shadow-sm"
             >
-              <p className="whitespace-pre-line wrap-break-word">{comment.text}</p>
+              <p className="whitespace-pre-line wrap-break-word">
+                {comment.text}
+              </p>
               <time
                 dateTime={comment.date}
                 className="mt-1 block text-sm text-stone-500"
