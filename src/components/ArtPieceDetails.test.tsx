@@ -14,10 +14,25 @@ function renderDetails() {
         genre="Genre Painting"
         isFavorite={false}
         onToggleFavorite={vi.fn()}
+        comments={[
+          { text: "Wonderful colors", date: "2026-11-09T10:00:00.000Z" },
+        ]}
+        onAddComment={vi.fn()}
       />
     </MemoryRouter>
   );
 }
+
+test("shows the comments section and the comment form", () => {
+  renderDetails();
+
+  expect(
+    screen.getByRole("region", { name: "Comments" })
+  ).toHaveTextContent("Wonderful colors");
+  expect(
+    screen.getByRole("textbox", { name: "Add a comment" })
+  ).toBeInTheDocument();
+});
 
 test("shows the image, title, artist, year and genre", () => {
   renderDetails();

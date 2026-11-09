@@ -1,5 +1,8 @@
 import { Link } from "react-router";
 
+import type { ArtPieceComment } from "../types";
+import CommentForm from "./CommentForm";
+import Comments from "./Comments";
 import FavoriteButton from "./FavoriteButton";
 
 type ArtPieceDetailsProps = {
@@ -10,6 +13,8 @@ type ArtPieceDetailsProps = {
   genre: string;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  comments: ArtPieceComment[];
+  onAddComment: (text: string) => void;
 };
 
 export default function ArtPieceDetails({
@@ -20,6 +25,8 @@ export default function ArtPieceDetails({
   genre,
   isFavorite,
   onToggleFavorite,
+  comments,
+  onAddComment,
 }: ArtPieceDetailsProps) {
   return (
     <article className="details">
@@ -43,6 +50,8 @@ export default function ArtPieceDetails({
         <dt>Genre</dt>
         <dd>{genre}</dd>
       </dl>
+      <Comments comments={comments} />
+      <CommentForm onSubmitComment={onAddComment} />
     </article>
   );
 }

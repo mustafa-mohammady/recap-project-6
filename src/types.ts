@@ -8,8 +8,15 @@ export type ArtPiece = {
   genre: string;
 };
 
+export type ArtPieceComment = {
+  text: string;
+  // an ISO date string, from new Date().toISOString()
+  date: string;
+};
+
 // our own information about an art piece, connected to it by the slug
 export type ArtPieceInfo = {
   slug: string;
   isFavorite: boolean;
+  comments: ArtPieceComment[];
 };

@@ -20,7 +20,8 @@ const artPieces: ArtPiece[] = [
 function renderPage(
   route: string,
   artPiecesInfo: ArtPieceInfo[] = [],
-  onToggleFavorite = vi.fn()
+  onToggleFavorite = vi.fn(),
+  onAddComment = vi.fn()
 ) {
   render(
     <MemoryRouter initialEntries={[route]}>
@@ -32,6 +33,7 @@ function renderPage(
               artPieces={artPieces}
               artPiecesInfo={artPiecesInfo}
               onToggleFavorite={onToggleFavorite}
+              onAddComment={onAddComment}
             />
           }
         />
@@ -64,7 +66,7 @@ test("shows a favorite button that toggles the art piece", async () => {
   const handleToggleFavorite = vi.fn();
   renderPage(
     "/art-pieces/the-harvesters",
-    [{ slug: "the-harvesters", isFavorite: true }],
+    [{ slug: "the-harvesters", isFavorite: true, comments: [] }],
     handleToggleFavorite
   );
 
@@ -74,4 +76,36 @@ test("shows a favorite button that toggles the art piece", async () => {
   await user.click(button);
 
   expect(handleToggleFavorite).toHaveBeenCalledWith("the-harvesters");
+});
+
+test("shows and adds the comments of the art piece", async () => {
+  const user = userEvent.setup();
+  const handleAddComment = vi.fn();
+  renderPage(
+    "/art-pieces/the-harvesters",
+    [
+      {
+        slug: "the-harvesters",
+        isFavorite: false,
+        comments: [
+          { text: "Wonderful colors", date: "2026-11-09T10:00:00.000Z" },
+        ],
+      },
+    ],
+    vi.fn(),
+    handleAddComment
+  );
+
+  expect(screen.getByText("Wonderful colors")).toBeInTheDocument();
+
+  await user.type(
+    screen.getByRole("textbox", { name: "Add a comment" }),
+    "So detailed"
+  );
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  expect(handleAddComment).toHaveBeenCalledWith(
+    "the-harvesters",
+    "So detailed"
+  );
 });
