@@ -14,7 +14,7 @@ export default function ArtPieceList({
   onToggleFavorite,
 }: ArtPieceListProps) {
   return (
-    <ul className="art-list">
+    <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
       {artPieces.map((artPiece) => (
         <li key={artPiece.slug}>
           <ArtPiecePreview
