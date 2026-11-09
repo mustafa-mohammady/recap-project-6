@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
 
@@ -86,4 +87,40 @@ test("shows one spotlight art piece and no list on /", async () => {
   expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
   expect(screen.getAllByRole("img")).toHaveLength(1);
   expect(screen.queryByRole("list")).not.toBeInTheDocument();
+});
+
+test("the navigation links show the Gallery and the Spotlight", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+  vi.spyOn(Math, "random").mockReturnValue(0);
+
+  renderApp("/");
+  await screen.findByRole("img");
+
+  await user.click(screen.getByRole("link", { name: "Gallery" }));
+  expect(screen.getAllByRole("listitem")).toHaveLength(2);
+
+  await user.click(screen.getByRole("link", { name: "Spotlight" }));
+  expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  expect(screen.getAllByRole("img")).toHaveLength(1);
+});
+
+test("shows a 'Page not found' message on unknown URLs", async () => {
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/does-not-exist");
+
+  expect(await screen.findByText("Page not found")).toBeInTheDocument();
+  expect(screen.getByRole("navigation")).toBeInTheDocument();
+});
+
+test("shows the navigation while the art pieces are loading", () => {
+  // a request that never finishes keeps the app in the loading state
+  vi.spyOn(globalThis, "fetch").mockReturnValue(new Promise(() => {}));
+
+  renderApp("/");
+
+  expect(screen.getByText("Loading art pieces…")).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Spotlight" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Gallery" })).toBeInTheDocument();
 });
