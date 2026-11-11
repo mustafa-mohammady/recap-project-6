@@ -15,7 +15,7 @@ export default function FavoriteButton({
       aria-pressed={isFavorite}
       aria-label="Favorite"
       onClick={onToggleFavorite}
-      className="focus-ring grid size-11 cursor-pointer place-items-center rounded-full bg-white/90 text-stone-600 shadow-md backdrop-blur transition hover:scale-110 aria-pressed:text-rose-600 motion-reduce:transition-none motion-reduce:hover:scale-100"
+      className="focus-ring grid size-11 cursor-pointer place-items-center rounded-full bg-white/60 text-ink shadow-lg shadow-indigo-900/10 ring-1 ring-white/80 backdrop-blur-xl transition duration-200 hover:scale-110 hover:bg-white/90 aria-pressed:text-rose-600 motion-reduce:transition-none motion-reduce:hover:scale-100"
     >
       {/* heart icon from lucide.dev/icons/heart, filled when favorite */}
       <svg

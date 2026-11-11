@@ -59,6 +59,67 @@ test("shows a back link to the list of art pieces", () => {
   ).toHaveAttribute("href", "/art-pieces");
 });
 
+test("the back link keeps the search of the gallery", () => {
+  // the gallery passes its search on when it links to the details
+  render(
+    <MemoryRouter
+      initialEntries={[
+        {
+          pathname: "/art-pieces/the-harvesters",
+          state: { gallerySearch: "?q=harvest" },
+        },
+      ]}
+    >
+      <ArtPieceDetails
+        image="https://example.com/harvesters.jpg"
+        title="The Harvesters"
+        artist="Pieter Bruegel the Elder"
+        year="1565"
+        genre="Genre Painting"
+        colors={[]}
+        isFavorite={false}
+        onToggleFavorite={vi.fn()}
+        comments={[]}
+        onAddComment={vi.fn()}
+      />
+    </MemoryRouter>
+  );
+
+  expect(
+    screen.getByRole("link", { name: "← Back to the gallery" })
+  ).toHaveAttribute("href", "/art-pieces?q=harvest");
+});
+
+test.each([
+  ["a value that is not a string", 42],
+  ["a path instead of a search", "/../favorites"],
+])("the back link ignores %s in the state", (_, gallerySearch) => {
+  render(
+    <MemoryRouter
+      initialEntries={[
+        { pathname: "/art-pieces/the-harvesters", state: { gallerySearch } },
+      ]}
+    >
+      <ArtPieceDetails
+        image="https://example.com/harvesters.jpg"
+        title="The Harvesters"
+        artist="Pieter Bruegel the Elder"
+        year="1565"
+        genre="Genre Painting"
+        colors={[]}
+        isFavorite={false}
+        onToggleFavorite={vi.fn()}
+        comments={[]}
+        onAddComment={vi.fn()}
+      />
+    </MemoryRouter>
+  );
+
+  expect(
+    screen.getByRole("link", { name: "← Back to the gallery" })
+  ).toHaveAttribute("href", "/art-pieces");
+});
+
 test("shows the color palette of the art piece", () => {
   renderDetails();
 

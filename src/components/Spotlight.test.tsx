@@ -59,6 +59,46 @@ test("shows the image and the artist of a random art piece", () => {
   expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
 });
 
+test("shows the title of the spotlight art piece as a heading", () => {
+  mockRandomValue(0);
+
+  render(
+    <Spotlight
+      artPieces={artPieces}
+      artPiecesInfo={[]}
+      onToggleFavorite={vi.fn()}
+    />
+  );
+
+  expect(
+    screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
+  ).toBeInTheDocument();
+});
+
+test.each([
+  // the dark greens of the wheat field: white text
+  [0, "Wheat Field with Cypresses", "rgb(255, 255, 255)"],
+  // the light yellows of the harvest: dark text
+  [1, "The Harvesters", "rgb(24, 24, 27)"],
+])(
+  "colors the text to fit the colors of the image (%#)",
+  (randomValue, title, textColor) => {
+    mockRandomValue(randomValue);
+
+    render(
+      <Spotlight
+        artPieces={artPieces}
+        artPiecesInfo={[]}
+        onToggleFavorite={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole("heading", { name: title })).toHaveStyle({
+      color: textColor,
+    });
+  }
+);
+
 test("keeps the same art piece when it re-renders", () => {
   mockRandomValue(0);
 

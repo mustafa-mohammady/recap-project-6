@@ -1,5 +1,7 @@
 import {
   addComment,
+  deleteComment,
+  editComment,
   getComments,
   isFavorite,
   toggleFavorite,
@@ -103,4 +105,104 @@ test("toggleFavorite and addComment do not change the given list", () => {
   addComment(artPiecesInfo, "the-harvesters", secondComment);
 
   expect(artPiecesInfo).toEqual(before);
+});
+
+describe("editComment", () => {
+  const editedDate = "2026-11-11T09:00:00.000Z";
+  const info: ArtPieceInfo[] = [
+    {
+      slug: "the-harvesters",
+      isFavorite: true,
+      comments: [firstComment, secondComment],
+    },
+    { slug: "the-night-watch", isFavorite: false, comments: [firstComment] },
+  ];
+
+  test("changes the text of the comment with the date and marks it edited", () => {
+    expect(
+      getComments(
+        editComment(
+          info,
+          "the-harvesters",
+          secondComment.date,
+          "Changed text",
+          editedDate
+        ),
+        "the-harvesters"
+      )
+    ).toEqual([
+      firstComment,
+      { ...secondComment, text: "Changed text", editedDate },
+    ]);
+  });
+
+  test("changes only the comment of the given art piece", () => {
+    const result = editComment(
+      info,
+      "the-harvesters",
+      firstComment.date,
+      "Changed text",
+      editedDate
+    );
+
+    // the same date on another art piece stays as it was
+    expect(getComments(result, "the-night-watch")).toEqual([firstComment]);
+    expect(isFavorite(result, "the-harvesters")).toBe(true);
+  });
+
+  test("changes nothing for an unknown art piece or date", () => {
+    expect(
+      editComment(info, "unknown", firstComment.date, "Changed", editedDate)
+    ).toEqual(info);
+    expect(
+      editComment(info, "the-harvesters", "unknown", "Changed", editedDate)
+    ).toEqual(info);
+  });
+
+  test("does not change the given list", () => {
+    const before = structuredClone(info);
+
+    editComment(
+      info,
+      "the-harvesters",
+      firstComment.date,
+      "Changed",
+      editedDate
+    );
+
+    expect(info).toEqual(before);
+  });
+});
+
+describe("deleteComment", () => {
+  const info: ArtPieceInfo[] = [
+    {
+      slug: "the-harvesters",
+      isFavorite: true,
+      comments: [firstComment, secondComment],
+    },
+    { slug: "the-night-watch", isFavorite: false, comments: [firstComment] },
+  ];
+
+  test("removes the comment with the date and keeps the others", () => {
+    const result = deleteComment(info, "the-harvesters", firstComment.date);
+
+    expect(getComments(result, "the-harvesters")).toEqual([secondComment]);
+    expect(isFavorite(result, "the-harvesters")).toBe(true);
+    // the same date on another art piece stays
+    expect(getComments(result, "the-night-watch")).toEqual([firstComment]);
+  });
+
+  test("changes nothing for an unknown art piece or date", () => {
+    expect(deleteComment(info, "unknown", firstComment.date)).toEqual(info);
+    expect(deleteComment(info, "the-harvesters", "unknown")).toEqual(info);
+  });
+
+  test("does not change the given list", () => {
+    const before = structuredClone(info);
+
+    deleteComment(info, "the-harvesters", firstComment.date);
+
+    expect(info).toEqual(before);
+  });
 });

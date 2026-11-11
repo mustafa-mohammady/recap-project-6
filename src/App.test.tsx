@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
 
@@ -26,6 +26,12 @@ const artPieces: ArtPiece[] = [
     colors: ["#C49A4A", "#6E7A3A", "#3E4A2A", "#D9C58C", "#8AA3B5"],
   },
 ];
+
+// opens the genre field and clicks a genre in its list
+async function chooseGenre(user: UserEvent, name: string) {
+  await user.click(screen.getByRole("combobox", { name: "Genre" }));
+  await user.click(screen.getByRole("option", { name }));
+}
 
 function renderApp(route: string) {
   return render(
@@ -303,6 +309,67 @@ test("favorites and comments are kept after a reload", async () => {
   expect(screen.getByText("Still here after a reload")).toBeInTheDocument();
 });
 
+test("the gallery can be searched and filtered by genre", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces");
+  await user.type(
+    await screen.findByRole("searchbox", { name: "Search" }),
+    "gogh"
+  );
+
+  const items = screen.getAllByRole("listitem");
+  expect(items).toHaveLength(1);
+  expect(
+    within(items[0]).getByRole("heading", {
+      name: "Wheat Field with Cypresses",
+    })
+  ).toBeInTheDocument();
+
+  await user.clear(screen.getByRole("searchbox", { name: "Search" }));
+  await chooseGenre(user, "Genre Painting");
+
+  expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  expect(
+    screen.getByRole("heading", { name: "The Harvesters" })
+  ).toBeInTheDocument();
+});
+
+test("the search is kept when coming back from the details", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces");
+  await user.type(
+    await screen.findByRole("searchbox", { name: "Search" }),
+    "harvest"
+  );
+  await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+  await user.click(screen.getByRole("link", { name: "← Back to the gallery" }));
+
+  expect(screen.getByRole("searchbox", { name: "Search" })).toHaveValue(
+    "harvest"
+  );
+  expect(screen.getAllByRole("listitem")).toHaveLength(1);
+});
+
+test("the Favorites page has no search", async () => {
+  const user = userEvent.setup();
+  vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
+
+  renderApp("/art-pieces");
+  const items = await screen.findAllByRole("listitem");
+  await user.click(within(items[0]).getByRole("button", { name: "Favorite" }));
+  await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+  expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("combobox", { name: "Genre" })
+  ).not.toBeInTheDocument();
+});
+
 test("the app works with broken data in the local storage", async () => {
   localStorage.setItem("art-pieces-info", "{ not json");
   vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(artPieces));
@@ -314,4 +381,70 @@ test("the app works with broken data in the local storage", async () => {
   expect(
     within(items[0]).getByRole("button", { name: "Favorite" })
   ).toHaveAttribute("aria-pressed", "false");
+});
+
+test("a comment can be edited and every change is saved at once", async () => {
+  const user = userEvent.setup();
+  // a new response for every request, because a body can be read only once
+  vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
+    Response.json(artPieces)
+  );
+
+  const { unmount } = renderApp("/art-pieces/the-harvesters");
+  await user.type(
+    await screen.findByRole("textbox", { name: "Add a comment" }),
+    "Nice harvest"
+  );
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  const comments = screen.getByRole("region", { name: "Comments" });
+  await user.click(within(comments).getByRole("button", { name: "Edit" }));
+  await user.type(
+    within(comments).getByRole("textbox", { name: "Edit comment" }),
+    " scene"
+  );
+
+  // a reload while still editing: the change is already saved
+  unmount();
+  renderApp("/art-pieces/the-harvesters");
+
+  const reloadedComments = await screen.findByRole("region", {
+    name: "Comments",
+  });
+  expect(reloadedComments).toHaveTextContent("Nice harvest scene");
+  expect(reloadedComments).toHaveTextContent("· edited");
+});
+
+test("a deleted comment is gone, also after a reload", async () => {
+  const user = userEvent.setup();
+  // a new response for every request, because a body can be read only once
+  vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
+    Response.json(artPieces)
+  );
+
+  const { unmount } = renderApp("/art-pieces/the-harvesters");
+  const field = await screen.findByRole("textbox", { name: "Add a comment" });
+  await user.type(field, "First");
+  await user.click(screen.getByRole("button", { name: "Send" }));
+  await user.type(field, "Second");
+  await user.click(screen.getByRole("button", { name: "Send" }));
+
+  const comments = screen.getByRole("region", { name: "Comments" });
+  const [first] = within(comments).getAllByRole("listitem");
+  await user.click(within(first).getByRole("button", { name: "Delete" }));
+  await user.click(
+    within(first).getByRole("button", { name: "Confirm delete" })
+  );
+
+  expect(within(comments).getAllByRole("listitem")).toHaveLength(1);
+  expect(comments).toHaveTextContent("Second");
+
+  unmount();
+  renderApp("/art-pieces/the-harvesters");
+
+  const reloadedComments = await screen.findByRole("region", {
+    name: "Comments",
+  });
+  expect(within(reloadedComments).getAllByRole("listitem")).toHaveLength(1);
+  expect(reloadedComments).not.toHaveTextContent("First");
 });
