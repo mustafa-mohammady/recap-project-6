@@ -2,14 +2,27 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
-import { addComment, isFavorite, toggleFavorite } from "./artPiecesInfo";
+import {
+  addComment,
+  deleteComment,
+  editComment,
+  isFavorite,
+  toggleFavorite,
+} from "./artPiecesInfo";
 import { loadArtPiecesInfo, saveArtPiecesInfo } from "./artPiecesInfoStorage";
 import ArtPieceDetailsPage from "./components/ArtPieceDetailsPage";
 import ArtPieceList from "./components/ArtPieceList";
+import GalleryPage from "./components/GalleryPage";
+import Loader from "./components/Loader";
 import Navigation from "./components/Navigation";
+import ScrollToTop from "./components/ScrollToTop";
 import Spotlight from "./components/Spotlight";
 import { fetcher } from "./fetcher";
 import type { ArtPieceInfo } from "./types";
+// the fonts are served by the app itself, not by Google, so no visitor data
+// goes to a third party
+import "@fontsource-variable/outfit";
+import "@fontsource-variable/inter";
 import "./styles.css";
 
 export const ART_PIECES_URL = "https://example-apis.vercel.app/api/art";
@@ -36,22 +49,31 @@ export default function App() {
     setArtPiecesInfo((current) => addComment(current, slug, comment));
   }
 
+  // called with every change while the user types, so the edit is saved
+  // (and kept after a reload) in real time
+  function handleEditComment(slug: string, date: string, text: string) {
+    const editedDate = new Date().toISOString();
+    setArtPiecesInfo((current) =>
+      editComment(current, slug, date, text, editedDate)
+    );
+  }
+
+  function handleDeleteComment(slug: string, date: string) {
+    setArtPiecesInfo((current) => deleteComment(current, slug, date));
+  }
+
   let content: ReactNode;
   if (error) {
     content = (
       <p
         role="alert"
-        className="rounded-xl bg-red-50 p-4 text-center text-red-700"
+        className="glass mx-auto max-w-md p-5 text-center font-medium text-red-700"
       >
         Failed to load the art pieces. Please try again.
       </p>
     );
   } else if (!artPieces) {
-    content = (
-      <p className="animate-pulse text-center text-stone-500">
-        Loading art pieces…
-      </p>
-    );
+    content = <Loader message="Loading art pieces…" />;
   } else {
     const favoriteArtPieces = artPieces.filter((artPiece) =>
       isFavorite(artPiecesInfo, artPiece.slug)
@@ -72,7 +94,7 @@ export default function App() {
         <Route
           path="/art-pieces"
           element={
-            <ArtPieceList
+            <GalleryPage
               artPieces={artPieces}
               artPiecesInfo={artPiecesInfo}
               onToggleFavorite={handleToggleFavorite}
@@ -90,7 +112,7 @@ export default function App() {
                 onToggleFavorite={handleToggleFavorite}
               />
             ) : (
-              <p className="text-center text-stone-500">
+              <p className="glass px-6 py-20 text-center font-display text-2xl font-semibold tracking-tight text-muted">
                 You have no favorite art pieces yet.
               </p>
             )
@@ -104,12 +126,18 @@ export default function App() {
               artPiecesInfo={artPiecesInfo}
               onToggleFavorite={handleToggleFavorite}
               onAddComment={handleAddComment}
+              onEditComment={handleEditComment}
+              onDeleteComment={handleDeleteComment}
             />
           }
         />
         <Route
           path="*"
-          element={<p className="text-center text-stone-500">Page not found</p>}
+          element={
+            <p className="glass px-6 py-20 text-center font-display text-2xl font-semibold tracking-tight text-muted">
+              Page not found
+            </p>
+          }
         />
       </Routes>
     );
@@ -118,14 +146,19 @@ export default function App() {
   // the layout and the navigation are rendered once, so every page shares them
   return (
     <>
-      {/* pb-28: room at the bottom, so the fixed navigation covers nothing */}
-      <main className="mx-auto max-w-5xl px-4 pt-8 pb-28">
-        <h1 className="mb-8 text-center text-3xl font-black tracking-[0.2em] uppercase sm:text-4xl">
-          Art Gallery
-        </h1>
+      <ScrollToTop />
+      {/* a floating, frosted pill: the page scrolls under it */}
+      <header className="sticky top-0 z-20 px-4 pt-3 sm:pt-4">
+        <div className="glass mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-3 sm:flex-row sm:justify-between sm:rounded-full! sm:py-2 sm:pr-2 sm:pl-6">
+          <h1 className="font-display text-lg font-bold tracking-tight text-accent">
+            Art Gallery
+          </h1>
+          <Navigation />
+        </div>
+      </header>
+      <main className="mx-auto max-w-6xl px-4 pt-8 pb-20 sm:pt-12">
         {content}
       </main>
-      <Navigation />
     </>
   );
 }

@@ -14,6 +14,8 @@ export type ArtPieceComment = {
   text: string;
   // an ISO date string, from new Date().toISOString()
   date: string;
+  // the same kind of date, set when the text was changed
+  editedDate?: string;
 };
 
 // our own information about an art piece, connected to it by the slug

@@ -1,18 +1,66 @@
 @import "tailwindcss";
 
-/* project colors, usable as classes like bg-paper or text-ink */
+/* project colors and fonts, usable as classes like bg-canvas, text-muted
+   or font-display; a light "glass" look: frosted panels in one accent color */
 @theme {
-  --color-paper: #f6f4ef;
-  --color-ink: #1c1917;
+  /* one soft, solid background color */
+  --color-canvas: #eef0fb;
+  --color-surface: #ffffff;
+  --color-ink: #18181b;
+  /* 7:1 or more on the glass panels */
+  --color-muted: #52525b;
+  /* thin dividers, only for decoration */
+  --color-line: rgb(24 24 27 / 0.08);
+  /* the edge of form fields, with at least 3:1 contrast */
+  --color-field: #86868b;
+  /* the one accent color: indigo, for links, focus rings and buttons;
+     5.9:1 on the glass, and white text on it 6.3:1 */
+  --color-accent: #4f46e5;
+  /* the same indigo, darker, for hover */
+  --color-accent-strong: #4338ca;
+
+  /* self-hosted with @fontsource-variable, imported in App.tsx */
+  --font-display: "Outfit Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* the spotlight image fades in and zooms out slowly */
+@keyframes spotlight-in {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* the same visible focus outline for every link and button */
 @utility focus-ring {
-  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500;
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+}
+
+/* a frosted glass panel: translucent white, a blur of what is behind it,
+   a light edge and a soft, slightly blue shadow */
+@utility glass {
+  @apply rounded-3xl bg-white/55 shadow-[inset_0_1px_0_rgb(255_255_255/0.7),0_8px_32px_rgb(49_46_129/0.1)] ring-1 ring-white/70 backdrop-blur-2xl backdrop-saturate-150;
+}
+
+/* a frame that softly pulses until its image is loaded; only a layer
+   behind the image pulses, so the image itself never blinks. The image
+   needs the class "relative", so it covers that layer once loaded */
+@utility image-placeholder {
+  @apply relative overflow-hidden bg-white/40 before:absolute before:inset-0 before:animate-pulse before:bg-white/60 motion-reduce:before:animate-none;
 }
 
 @layer base {
+  /* room for the sticky header, so it never covers a focused element */
+  html {
+    @apply scroll-pt-36 sm:scroll-pt-28;
+  }
+
   body {
-    @apply bg-paper font-sans text-ink antialiased;
+    @apply bg-canvas font-sans text-ink antialiased selection:bg-accent/20;
   }
 }

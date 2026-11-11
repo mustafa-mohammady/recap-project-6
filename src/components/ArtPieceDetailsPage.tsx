@@ -9,6 +9,10 @@ type ArtPieceDetailsPageProps = {
   artPiecesInfo: ArtPieceInfo[];
   onToggleFavorite: (slug: string) => void;
   onAddComment: (slug: string, text: string) => void;
+  // without it, the comments cannot be edited
+  onEditComment?: (slug: string, date: string, text: string) => void;
+  // without it, the comments cannot be deleted
+  onDeleteComment?: (slug: string, date: string) => void;
 };
 
 export default function ArtPieceDetailsPage({
@@ -16,6 +20,8 @@ export default function ArtPieceDetailsPage({
   artPiecesInfo,
   onToggleFavorite,
   onAddComment,
+  onEditComment,
+  onDeleteComment,
 }: ArtPieceDetailsPageProps) {
   // the slug comes from the dynamic route /art-pieces/:slug
   const { slug } = useParams();
@@ -23,11 +29,13 @@ export default function ArtPieceDetailsPage({
 
   if (!artPiece) {
     return (
-      <div className="text-center">
-        <p className="text-stone-500">Art piece not found</p>
+      <div className="glass px-6 py-20 text-center">
+        <p className="font-display text-2xl font-semibold tracking-tight text-muted">
+          Art piece not found
+        </p>
         <Link
           to="/art-pieces"
-          className="focus-ring mt-4 inline-block rounded text-stone-700 underline underline-offset-4 hover:text-ink"
+          className="focus-ring mt-4 inline-block rounded text-sm text-accent underline-offset-4 hover:underline"
         >
           ← Back to the gallery
         </Link>
@@ -47,6 +55,13 @@ export default function ArtPieceDetailsPage({
       onToggleFavorite={() => onToggleFavorite(artPiece.slug)}
       comments={getComments(artPiecesInfo, artPiece.slug)}
       onAddComment={(text) => onAddComment(artPiece.slug, text)}
+      onEditComment={
+        onEditComment &&
+        ((date, text) => onEditComment(artPiece.slug, date, text))
+      }
+      onDeleteComment={
+        onDeleteComment && ((date) => onDeleteComment(artPiece.slug, date))
+      }
     />
   );
 }
